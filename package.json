@@ -1,0 +1,36 @@
+{
+  "name": "dsa-visualizer",
+  "version": "1.0.0",
+  "description": "Interactive Data Structures & Algorithms Visualizer with real-time animations",
+  "author": "Your Name",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write src"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "framer-motion": "^10.12.0",
+    "lucide-react": "^0.200.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "prettier": "^2.8.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.0.0",
+    "vitest": "^0.30.0"
+  }
+}
