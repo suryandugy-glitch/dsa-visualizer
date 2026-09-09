@@ -405,11 +405,242 @@ const quickSortSteps = (array: number[]): AlgorithmStep[] => {
   return steps;
 };
 
-// Binary Search Implementation
-const binarySearchSteps = (array: number[], target: number = 50): AlgorithmStep[] => {
+// Heap Sort Implementation
+const heapSortSteps = (array: number[]): AlgorithmStep[] => {
   const steps: AlgorithmStep[] = [];
-  const arr = [...array].sort((a, b) => a - b); // Binary search requires sorted array
+  const arr = [...array];
   let stepId = 0;
+
+  // Initial state
+  steps.push({
+    id: stepId++,
+    description: 'Initial array',
+    data: { array: [...arr] },
+    operationCount: { comparisons: 0, swaps: 0, assignments: 0 }
+  });
+
+  // Build max heap
+  const heapify = (n: number, i: number) => {
+    let largest = i;
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+
+    if (left < n) {
+      steps.push({
+        id: stepId++,
+        description: `Comparing left child ${arr[left]} (index ${left}) with parent ${arr[largest]} (index ${largest})`,
+        data: { array: [...arr] },
+        highlights: { indices: [i, left] },
+        operationCount: {
+          comparisons: steps.length,
+          swaps: 0,
+          assignments: 0
+        }
+      });
+
+      if (arr[left] > arr[largest]) {
+        largest = left;
+      }
+    }
+
+    if (right < n) {
+      steps.push({
+        id: stepId++,
+        description: `Comparing right child ${arr[right]} (index ${right}) with parent ${arr[largest]} (index ${largest})`,
+        data: { array: [...arr] },
+        highlights: { indices: [i, right] },
+        operationCount: {
+          comparisons: steps.length,
+          swaps: 0,
+          assignments: 0
+        }
+      });
+
+      if (arr[right] > arr[largest]) {
+        largest = right;
+      }
+    }
+
+    if (largest !== i) {
+      steps.push({
+        id: stepId++,
+        description: `Swapping parent ${arr[i]} (index ${i}) with largest child ${arr[largest]} (index ${largest})`,
+        data: { array: [...arr] },
+        highlights: { indices: [i, largest] },
+        operationCount: {
+          comparisons: steps.length,
+          swaps: steps.length - 1,
+          assignments: 2
+        }
+      });
+
+      [arr[i], arr[largest]] = [arr[largest], arr[i]];
+
+      // Recursively heapify the affected sub-tree
+      heapify(n, largest);
+    }
+  };
+
+  // Build max heap
+  const n = arr.length;
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    steps.push({
+      id: stepId++,
+      description: `Heapifying subtree rooted at index ${i}`,
+      data: { array: [...arr] },
+      highlights: { indices: [i] },
+      operationCount: {
+        comparisons: steps.length,
+        swaps: 0,
+        assignments: 0
+      }
+    });
+    heapify(n, i);
+  }
+
+  // Extract elements from heap one by one
+  for (let i = n - 1; i > 0; i--) {
+    steps.push({
+      id: stepId++,
+      description: `Moving root ${arr[0]} to end (index ${i})`,
+      data: { array: [...arr] },
+      highlights: { indices: [0, i] },
+      operationCount: {
+        comparisons: steps.length,
+        swaps: 0,
+        assignments: 0
+      }
+    });
+
+    [arr[0], arr[i]] = [arr[i], arr[0]];
+
+    steps.push({
+      id: stepId++,
+      description: `Swapped root with last element, heap size reduced to ${i}`,
+      data: { array: [...arr] },
+      highlights: { indices: [0] },
+      operationCount: {
+        comparisons: steps.length,
+        swaps: steps.length - 1,
+        assignments: 2
+      }
+    });
+
+    heapify(i, 0);
+  }
+
+  // Final state
+  steps.push({
+    id: stepId++,
+    description: 'Sorting complete!',
+    data: { array: [...arr] },
+    operationCount: {
+      comparisons: steps.filter(s => s.description.includes('Comparing')).length,
+      swaps: steps.filter(s => s.description.includes('Swapping')).length,
+      assignments: steps.reduce((sum, s) => sum + (s.operationCount.assignments || 0), 0)
+    }
+  });
+
+  return steps;
+};
+
+// Radix Sort Implementation (for non-negative integers)
+const radixSortSteps = (array: number[]): AlgorithmStep[] => {
+  const steps: AlgorithmStep[] = [];
+  const arr = [...array];
+  let stepId = 0;
+
+  // Initial state
+  steps.push({
+    id: stepId++,
+    description: 'Initial array',
+    data: { array: [...arr] },
+    operationCount: { comparisons: 0, swaps: 0, assignments: 0 }
+  });
+
+  if (arr.length === 0) {
+    steps.push({
+      id: stepId++,
+      description: 'Empty array - nothing to sort',
+      data: { array: [...arr] },
+      operationCount: { comparisons: 0, swaps: 0, assignments: 0 }
+    });
+    return steps;
+  }
+
+  // Find the maximum number to know the number of digits
+  const maxNum = Math.max(...arr);
+  const maxDigits = maxNum.toString().length;
+
+  // Perform counting sort for every digit
+  for (let digit = 0; digit < maxDigits; digit++) {
+    steps.push({
+      id: stepId++,
+      description: `Sorting by digit ${digit + 1} (${digit === 0 ? 'units' : digit === 1 ? 'tens' : 'hundreds+'})`,
+      data: { array: [...arr] },
+      operationCount: {
+        comparisons: steps.length,
+        swaps: 0,
+        assignments: 0
+      }
+    });
+
+    // Create buckets for each digit (0-9)
+    const buckets: number[][] = Array.from({ length: 10 }, () => []);
+
+    // Place each number in the appropriate bucket
+    arr.forEach((num, index) => {
+      const digitValue = Math.floor((num / Math.pow(10, digit)) % 10);
+      buckets[digitValue].push(num);
+
+      steps.push({
+        id: stepId++,
+        description: `Placing ${num} in bucket ${digitValue} (digit ${digit + 1})`,
+        data: { array: [...arr] },
+        highlights: { indices: [index] },
+        operationCount: {
+          comparisons: steps.length,
+          swaps: 0,
+          assignments: 1
+        }
+      });
+    });
+
+    // Collect numbers from buckets back to array
+    let index = 0;
+    buckets.forEach((bucket, bucketIndex) => {
+      bucket.forEach((num) => {
+        arr[index] = num;
+        steps.push({
+          id: stepId++,
+          description: `Collecting ${num} from bucket ${bucketIndex} back to array position ${index}`,
+          data: { array: [...arr] },
+          highlights: { indices: [index] },
+          operationCount: {
+            comparisons: steps.length,
+            swaps: 0,
+            assignments: 1
+          }
+        });
+        index++;
+      });
+    });
+  }
+
+  // Final state
+  steps.push({
+    id: stepId++,
+    description: 'Sorting complete!',
+    data: { array: [...arr] },
+    operationCount: {
+      comparisons: steps.filter(s => s.description.includes('Comparing')).length,
+      swaps: 0,
+      assignments: steps.reduce((sum, s) => sum + (s.operationCount.assignments || 0), 0)
+    }
+  });
+
+  return steps;
+};
 
   // Initial state
   steps.push({
@@ -574,8 +805,8 @@ const algorithmGenerators: Record<AlgorithmType, (data: number[]) => AlgorithmSt
   'insertion-sort': insertionSortSteps,
   'merge-sort': mergeSortSteps,
   'quick-sort': quickSortSteps,
-  'heap-sort': bubbleSortSteps, // Placeholder
-  'radix-sort': bubbleSortSteps, // Placeholder
+  'heap-sort': heapSortSteps,
+  'radix-sort': radixSortSteps,
   'binary-search': binarySearchSteps,
   'linear-search': linearSearchSteps,
   'dfs': bubbleSortSteps, // Placeholder
@@ -596,12 +827,33 @@ export const useAlgorithm = (algorithm: AlgorithmType, initialData: number[]) =>
     return;
   }, []);
 
-  // Placeholder complexity info - would be calculated based on algorithm and data size
-  const complexity: ComplexityInfo = {
-    time: 'O(n log n)', // Default
-    space: 'O(log n)',  // Default
-    description: 'Standard complexity for this algorithm'
-  };
+  // Complexity info based on algorithm
+  let complexity: ComplexityInfo;
+  switch (algorithm) {
+    case 'heap-sort':
+      complexity = { time: 'O(n log n)', space: 'O(1)', description: 'Heap sort has O(n log n) time complexity in all cases and O(1) space complexity' };
+      break;
+    case 'radix-sort':
+      complexity = { time: 'O(d * (n + b))', space: 'O(n + b)', description: 'Radix sort time complexity is O(d*(n+b)) where d is number of digits, b is base (usually 10), and n is number of elements' };
+      break;
+    case 'merge-sort':
+    case 'quick-sort':
+      complexity = { time: 'O(n log n)', space: 'O(log n)', description: 'Standard complexity for this algorithm' };
+      break;
+    case 'bubble-sort':
+    case 'insertion-sort':
+    case 'selection-sort':
+      complexity = { time: 'O(n²)', space: 'O(1)', description: 'Simple sort algorithms have O(n²) time complexity in worst case' };
+      break;
+    case 'binary-search':
+      complexity = { time: 'O(log n)', space: 'O(1)', description: 'Binary search has logarithmic time complexity' };
+      break;
+    case 'linear-search':
+      complexity = { time: 'O(n)', space: 'O(1)', description: 'Linear search has linear time complexity' };
+      break;
+    default:
+      complexity = { time: 'O(n log n)', space: 'O(log n)', description: 'Standard complexity for this algorithm' };
+  }
 
   return { generateSteps, reset, complexity };
 };
