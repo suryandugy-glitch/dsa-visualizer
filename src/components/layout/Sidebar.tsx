@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import { AlgorithmType, DataStructureType } from '@/types';
-import { FaSort, FaListUl, FaChartBar, FaProjectDiagram, FaCube, FaNetworkWired } from 'react-icons/fa';
 
 const Sidebar: React.FC<{
   selectedType: 'algorithm' | 'data-structure';
   selectedItem: string;
   onTypeChange: (type: 'algorithm' | 'data-structure') => void;
-  onItemSelect: (item: string) => void;
+  onItemSelect: (type: 'algorithm' | 'data-structure', item: string) => void;
 }> = ({ selectedType, selectedItem, onTypeChange, onItemSelect }) => {
 
   const algorithms: AlgorithmType[] = [
-    'bubble-sort', 'selection-sort', 'insertion-sort', 'merge-sort',
-    'quick-sort', 'heap-sort', 'radix-sort', 'binary-search', 'linear-search',
-    'dfs', 'bfs', 'dijkstra', 'prims', 'kruskals'
+    'bubble-sort', 'insertion-sort', 'merge-sort', 'quick-sort',
+    'heap-sort', 'radix-sort', 'binary-search', 'linear-search'
   ];
 
   const dataStructures: DataStructureType[] = [
-    'array', 'linked-list', 'stack', 'queue', 'binary-search-tree',
-    'avl-tree', 'red-black-tree', 'hash-table', 'heap', 'trie', 'graph'
+    'array', 'linked-list', 'stack', 'queue'
   ];
 
   const [toggleState, setToggleState] = useState({
@@ -57,7 +54,7 @@ const Sidebar: React.FC<{
                 <button
                   key={algo}
                   className={`sidebar-item ${isSelected ? 'active' : ''}`}
-                  onClick={() => onItemSelect(algo)}
+                  onClick={() => onItemSelect('algorithm', algo)}
                 >
                   {algoName}
                 </button>
@@ -80,7 +77,7 @@ const Sidebar: React.FC<{
                 <button
                   key={ds}
                   className={`sidebar-item ${isSelected ? 'active' : ''}`}
-                  onClick={() => onItemSelect(ds)}
+                  onClick={() => onItemSelect('data-structure', ds)}
                 >
                   {dsName}
                 </button>

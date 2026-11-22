@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import './App.css';
 import Sidebar from './components/layout/Sidebar';
 import VisualizationCanvas from './components/visualizations/VisualizationCanvas';
 import ControlsPanel from './components/controls/ControlsPanel';
-import { AlgorithmType, DataStructureType } from './types';
+
+const createArray = () => Array.from({ length: 20 }, () => Math.floor(Math.random() * 100) + 1);
 
 const App: React.FC = () => {
   const [selectedType, setSelectedType] = useState<'algorithm' | 'data-structure'>('algorithm');
@@ -11,48 +11,28 @@ const App: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(5); // 1-10 scale
   const [stepByStep, setStepByStep] = useState(false);
-  const [arrayData, setArrayData] = useState<number[]>([]);
-  const [complexity, setComplexity] = useState({ time: '', space: '' });
+  const [arrayData, setArrayData] = useState(createArray);
+  const [stepIndex, setStepIndex] = useState(0);
 
-  // Generate random array data
-  const generateRandomArray = (size: number = 20) => {
-    return Array.from({ length: size }, () => Math.floor(Math.random() * 100) + 1);
-  };
-
-  // Handle play/pause
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  // Handle step forward
-  const stepForward = () => {
-    // Implementation would advance one step in the algorithm
-    console.log('Stepping forward');
-  };
-
-  // Handle reset
   const resetVisualization = () => {
     setIsPlaying(false);
-    setArrayData(generateRandomArray());
-    // Reset algorithm state
+    setStepIndex(0);
   };
 
-  // Handle item selection
-  const handleItemSelect = (item: string) => {
+  const handleItemSelect = (type: 'algorithm' | 'data-structure', item: string) => {
+    setSelectedType(type);
     setSelectedItem(item);
     resetVisualization();
   };
 
-  // Handle type change
   const handleTypeChange = (type: 'algorithm' | 'data-structure') => {
-    setSelectedType(type);
-    // Reset to default item for new type
-    setSelectedItem(type === 'algorithm' ? 'bubble-sort' : 'array');
-    resetVisualization();
+    handleItemSelect(type, type === 'algorithm' ? 'bubble-sort' : 'array');
   };
 
-  // Initialize with random data
-  const initialData = generateRandomArray();
+  const handleDataChange = (data: number[]) => {
+    setArrayData(data);
+    resetVisualization();
+  };
 
   return (
     <div className="app">
@@ -76,24 +56,24 @@ const App: React.FC = () => {
             data={arrayData}
             isPlaying={isPlaying}
             speed={speed}
-            stepByStep={stepByStep}
-            onPlayPause={togglePlay}
-            onStepForward={stepForward}
-            onReset={resetVisualization}
-            onDataChange={setArrayData}
-            complexity={complexity}
+            stepIndex={stepIndex}
+            onStepChange={setStepIndex}
+            onPlaybackEnd={() => setIsPlaying(false)}
           />
 
           <ControlsPanel
             isPlaying={isPlaying}
             speed={speed}
             stepByStep={stepByStep}
-            onPlayPause={togglePlay}
+            onPlayPause={() => setIsPlaying((playing) => !playing)}
             onSpeedChange={setSpeed}
-            onStepByStepChange={setStepByStep}
-            onStepForward={stepForward}
+            onStepByStepChange={(enabled) => {
+              setStepByStep(enabled);
+              setIsPlaying(false);
+            }}
+            onStepForward={() => setStepIndex((step) => step + 1)}
             onReset={resetVisualization}
-            onDataChange={setArrayData}
+            onDataChange={handleDataChange}
           />
         </div>
       </div>
@@ -101,7 +81,7 @@ const App: React.FC = () => {
       <footer className="app-footer">
         <p>Made with ❤️ for learners everywhere</p>
         <p>
-          <a href="https://github.com/yourusername/DSA-Visualizer" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/suryandugy-glitch/dsa-visualizer" target="_blank" rel="noopener noreferrer">
             View on GitHub
           </a>
         </p>

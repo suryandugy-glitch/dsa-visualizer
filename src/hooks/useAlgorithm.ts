@@ -642,6 +642,12 @@ const radixSortSteps = (array: number[]): AlgorithmStep[] => {
   return steps;
 };
 
+// Binary search runs on a sorted copy of the input.
+const binarySearchSteps = (array: number[], target = 50): AlgorithmStep[] => {
+  const steps: AlgorithmStep[] = [];
+  const arr = [...array].sort((a, b) => a - b);
+  let stepId = 0;
+
   // Initial state
   steps.push({
     id: stepId++,

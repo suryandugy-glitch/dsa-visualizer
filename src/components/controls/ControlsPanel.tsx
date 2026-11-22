@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaPlay, FaPause, FaStepForward, FaRedo, FaMoon, FaSun } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaRedo } from 'react-icons/fa';
 
 const ControlsPanel: React.FC<{
   isPlaying: boolean;
@@ -13,7 +13,6 @@ const ControlsPanel: React.FC<{
   onDataChange: (data: number[]) => void;
 }> = ({ isPlaying, speed, stepByStep, onPlayPause, onSpeedChange, onStepByStepChange, onStepForward, onReset, onDataChange }) => {
   const [arraySize, setArraySize] = useState(20);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const generateArray = () => {
     const newArray = Array.from({ length: arraySize }, () => Math.floor(Math.random() * 100) + 1);
@@ -32,13 +31,6 @@ const ControlsPanel: React.FC<{
     <div className="controls-panel">
       <div className="controls-header">
         <h3>Controls</h3>
-        <button
-          className="theme-toggle"
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          title="Toggle theme"
-        >
-          {isDarkMode ? <FaSun /> : <FaMoon />}
-        </button>
       </div>
 
       <div className="controls-group">
@@ -48,6 +40,8 @@ const ControlsPanel: React.FC<{
             onClick={onPlayPause}
             className="control-btn"
             title="Play/Pause"
+            aria-label={isPlaying ? "Pause" : "Play"}
+            disabled={stepByStep}
           >
             {isPlaying ? <FaPause /> : <FaPlay />}
           </button>
@@ -55,7 +49,7 @@ const ControlsPanel: React.FC<{
             onClick={onStepForward}
             className="control-btn"
             title="Step Forward"
-            disabled={isPlaying && !stepByStep}
+            disabled={isPlaying}
           >
             <FaStepForward />
           </button>
@@ -93,6 +87,7 @@ const ControlsPanel: React.FC<{
             <input
               type="checkbox"
               checked={stepByStep}
+              aria-label="Manual stepping"
               onChange={(e) => onStepByStepChange(e.target.checked)}
             />
             <span className="slider"></span>
@@ -131,7 +126,7 @@ const ControlsPanel: React.FC<{
           onBlur={(e) => {
             const input = e.target.value;
             if (input) {
-              const numbers = input.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+              const numbers = input.split(',').map(num => parseInt(num.trim())).filter(num => Number.isSafeInteger(num) && num >= 0 && num <= 999999).slice(0, 50);
               if (numbers.length > 0) {
                 onDataChange(numbers);
               }
