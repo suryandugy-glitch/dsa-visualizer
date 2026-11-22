@@ -1,4 +1,11 @@
+<img src="public/cellar-logo.png" width="64" height="64" alt="DSA Visualizer logo">
+
 # DSA Visualizer by Cellar
+
+[Launch DSA Visualizer](https://suryandugy-glitch.github.io/dsa-visualizer/) · [Report an issue](https://github.com/suryandugy-glitch/dsa-visualizer/issues)
+
+Choose a sorting algorithm and enter 5, 3, 8, 1. Advance one step at a time to follow each comparison.
+
 
 [Open the live visualizer](https://suryandugy-glitch.github.io/dsa-visualizer/)
 
